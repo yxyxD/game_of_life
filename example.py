@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-gridSize = 10
-numberOfGenerations = 10
+gridSize = 100
+numberOfGenerations = 100
 
 def getNeighborCount(x, y):
     global generation
@@ -38,24 +38,31 @@ def applyRules(x, y):
     return
 
 def playGame():
-    t = 1
     global generation
     global newGeneration
     global numberOfGenerations
-    while t <= numberOfGenerations:
-        for x in range(gridSize):
-            for y in range(gridSize):
-                applyRules(x, y)
-        generation = np.copy(newGeneration)
-        print("At generation %d" % t)
-        print(generation)
-        t += 1
-    return
+    for x in range(gridSize):
+        for y in range(gridSize):
+            applyRules(x, y)
+    generation = np.copy(newGeneration)
+    print(generation)
+    return #generation
 
 def initWithBeacon():
     global generation
-    beacon = [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]
+    beacon = [[1, 1, 0, 0],
+              [1, 1, 0, 0],
+              [0, 0, 1, 1],
+              [0, 0, 1, 1]]
     generation[1:5, 1:5] = beacon
+    return
+
+def initWithGlider():
+    global generation
+    glider = [[0, 1, 0],
+              [0, 0, 1],
+              [1, 1, 1]]
+    generation[1:4, 1:4] = glider
     return
 
 def initWithRandom():
@@ -64,13 +71,27 @@ def initWithRandom():
     generation = randomSeed
     return
 
-if (__name__ == "__main__"):
+def initGeneration():
+    global generation
     generation = np.zeros((gridSize, gridSize), dtype=np.int64)
     #initWithBeacon()
     initWithRandom()
+    #initWithGlider()
+    return generation
+
+if (__name__ == "__main__"):
+    generation = initGeneration()
     print(generation)
     newGeneration = np.copy(generation)
-    playGame()
-    #plt.axis('off')
-    #plt.imshow(generation, cmap='binary', interpolation='nearest')
-    #plt.show()
+
+    fig = plt.figure()
+    ims = []
+    plt.axis('off')
+
+    for i in range(numberOfGenerations):
+        ims.append((plt.imshow(generation, cmap='binary', interpolation='nearest'),))
+        playGame()
+
+    anim = animation.ArtistAnimation(fig, ims, interval=200, repeat=False, blit=True)
+
+    plt.show()
