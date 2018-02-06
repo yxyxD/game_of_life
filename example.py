@@ -33,6 +33,7 @@ def applyRules(x, y):
         elif neighborCount > 3:
             newGeneration[x, y] = 0
     elif generation[x, y] == 0:
+        # == 3 oder > 3? => Regeln nachgucken
         if neighborCount == 3:
             newGeneration[x, y] = 1
     return
