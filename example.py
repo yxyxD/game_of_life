@@ -1,9 +1,14 @@
+################################################################################
+# @TODO obsolete file
+################################################################################
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 gridSize = 100
 numberOfGenerations = 100
+
 
 def getNeighborCount(x, y):
     global generation
@@ -47,7 +52,7 @@ def playGame():
             applyRules(x, y)
     generation = np.copy(newGeneration)
     print(generation)
-    return #generation
+    return #mdl_population
 
 def initWithBeacon():
     global generation
