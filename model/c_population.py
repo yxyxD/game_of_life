@@ -6,6 +6,10 @@ class Population:
     ############################################################################
     #                           Constructor                                    #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-07 (yxyxD)  created
+    # @brief    Creates a new population with randomly placed bacteria.
     def __init__(self, grid_size):
         self.grid_size = grid_size
         self.world = numpy.random.randint(
@@ -17,6 +21,11 @@ class Population:
     ############################################################################
     #                           Public Methods                                 #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-07 (yxyxD)  created
+    # @brief    Creates and returns the grid of the next population. The
+    #           population status of the object will be updated as well.
     def create_and_return_next_generation(self):
         new_world = self.world.copy()
 
@@ -42,6 +51,13 @@ class Population:
     ############################################################################
     #                           Private Methods                                #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-07 (yxyxD)  created
+    # @brief    Counts and returns the total amount of living neighbors of a
+    #           cell. If the cell is on the edge of grid, cells on the other
+    #           end of the grid count as neighbors too.
+    # @todo     the counting logic for cells at the edge is most likely wrong
     def __get_neighbor_count(self, x, y):
         count = 0
 
@@ -59,4 +75,5 @@ class Population:
                     count += self.world[i][0]
                 else:
                     count += self.world[0][0]
+
         return count
