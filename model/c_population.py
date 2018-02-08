@@ -3,6 +3,11 @@ import numpy as numpy
 
 class Population:
 
+    standard_grid_size = 100
+    mode_sequential = "sequential"
+    mode_parallel = "parallel"
+
+
     ############################################################################
     #                           Constructor                                    #
     ############################################################################
@@ -10,8 +15,9 @@ class Population:
     # @changes
     #       2018-02-07 (yxyxD)  created
     # @brief    Creates a new population with randomly placed bacteria.
-    def __init__(self, grid_size):
+    def __init__(self, grid_size, mode):
         self.grid_size = grid_size
+        self.mode = mode
         self.world = numpy.random.randint(
             2,
             size=(grid_size, grid_size)
@@ -40,7 +46,6 @@ class Population:
                     elif neighbor_count > 3:
                         new_world[x, y] = 0
                 elif self.world[x, y] == 0:
-                    # todo == 3 oder > 3? => Regeln nachgucken
                     if neighbor_count == 3:
                         new_world[x, y] = 1
 
