@@ -18,7 +18,8 @@ def __user_input_grid_size():
     standard_grid_size = Population.standard_grid_size
 
     user_input = input(
-        "Please enter the grid size (" + str(standard_grid_size) + "): ")
+        "Please enter the grid size (" + str(standard_grid_size) + "): "
+    )
 
     try:
         value = int(user_input)
@@ -88,6 +89,8 @@ if __name__ == '__main__':
     grid_size = __user_input_grid_size()
     mode = __user_input_mode()
 
+    print("Program started")
+
     population = Population(grid_size, mode)
 
     fig, ax = mpl_pyplot.subplots()
@@ -102,4 +105,5 @@ if __name__ == '__main__':
     )
 
     mpl_pyplot.show()
+
 

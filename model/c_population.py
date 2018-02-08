@@ -1,5 +1,8 @@
 import numpy as numpy
 
+from multiprocessing import Pool
+from concurrent.futures import ProcessPoolExecutor, wait, ThreadPoolExecutor
+
 
 class Population:
 
@@ -35,6 +38,37 @@ class Population:
     def create_and_return_next_generation(self):
         new_world = self.world.copy()
 
+        if (self.mode == self.mode_sequential):
+            new_world = self.__calculate_next_generation_sequential()
+        if (self.mode == self.mode_parallel):
+            new_world = self.__calculate_next_generation_parallel()
+
+        '''
+        for x in range(self.grid_size):
+            for y in range(self.grid_size):
+                neighbor_count = self.__get_neighbor_count(x, y)
+                if self.world[x, y] == 1:
+                    if neighbor_count < 2:
+                        new_world[x, y] = 0
+                    elif neighbor_count == 2 or neighbor_count == 3:
+                        new_world[x, y] = 1
+                    elif neighbor_count > 3:
+                        new_world[x, y] = 0
+                elif self.world[x, y] == 0:
+                    if neighbor_count == 3:
+                        new_world[x, y] = 1
+        '''
+
+        self.world = new_world
+
+        return new_world
+
+
+
+
+    def __calculate_next_generation_sequential(self):
+        new_world = self.world.copy()
+
         for x in range(self.grid_size):
             for y in range(self.grid_size):
                 neighbor_count = self.__get_neighbor_count(x, y)
@@ -52,6 +86,52 @@ class Population:
         self.world = new_world
 
         return new_world
+
+    def __calculate_next_generation_parallel(self):
+        new_world = self.world.copy()
+
+        #iterations = numpy.arange(0, self.grid_size, 1)
+        #pool = Pool()
+        #results = [pool.map(self.__get_next_row, iterations)]
+        #for x, row in results:
+        #    new_world[x] = row
+
+        executor = ThreadPoolExecutor()
+        future_list = []
+        for x in range(self.grid_size):
+            future = executor.submit(self.__get_next_row, x)
+            future_list.append(future)
+
+        wait(future_list)
+
+        for future in future_list:
+            x, row = future.result()
+            new_world[x] = row
+
+        return new_world
+
+    def __get_next_row(self, x):
+        row = numpy.zeros(self.grid_size)
+
+        for y in range(self.grid_size):
+            neighbor_count = self.__get_neighbor_count(x, y)
+            if self.world[x, y] == 1:
+                if neighbor_count < 2:
+                    row[y] = 0
+                elif neighbor_count == 2 or neighbor_count == 3:
+                    row[y] = 1
+                elif neighbor_count > 3:
+                    row[y] = 0
+            elif self.world[x, y] == 0:
+                if neighbor_count == 3:
+                    row[y] = 1
+
+        return x, row
+
+
+
+
+
 
     ############################################################################
     #                           Private Methods                                #
