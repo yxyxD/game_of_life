@@ -5,6 +5,8 @@ import matplotlib.animation as mpl_animation
 
 from matplotlib.colors import ListedColormap
 
+import multiprocessing
+
 
 ################################################################################
 #                           User Input Functions                               #
@@ -101,8 +103,32 @@ if __name__ == '__main__':
     animation = mpl_animation.FuncAnimation(
         fig,
         update,
-        interval=100
+        interval=50
     )
+
+
+    #-------------------
+    borders = []
+    cpu_count = multiprocessing.cpu_count()
+
+    div, mod = divmod(grid_size, cpu_count)
+    if (mod == 0):
+        iterator = div
+    else:
+        iterator = div + 1
+
+    print(str(iterator))
+
+    for i in range(cpu_count + 1):
+        border = iterator * i
+        if (border <= grid_size):
+            borders.append(border)
+        else:
+            borders.append(grid_size)
+
+    print(borders)
+    #-------------------
+
 
     mpl_pyplot.show()
 
