@@ -5,8 +5,6 @@ import matplotlib.animation as mpl_animation
 
 from matplotlib.colors import ListedColormap
 
-import multiprocessing
-
 
 ################################################################################
 #                           User Input Functions                               #
@@ -20,12 +18,12 @@ def __user_input_grid_size():
     standard_grid_size = Population.standard_grid_size
 
     user_input = input(
-        "Please enter the grid size (" + str(standard_grid_size) + "): "
+        "Please enter the grid size [" + str(standard_grid_size) + "]: "
     )
 
     try:
         value = int(user_input)
-        if (value > 0):
+        if value > 0:
             grid_size = value
         else:
             grid_size = standard_grid_size
@@ -40,26 +38,26 @@ def __user_input_grid_size():
 # @author   yxyxD
 # @changes
 #       2018-02-08 (yxyxD)  created
-# @brief    Requests the calculation mode from the user. If the input is
+# @brief    Requests the calculation __mode from the user. If the input is
 #           incorrect the standard_mode will be used instead.
 def __user_input_mode():
     standard_mode = Population.mode_sequential
 
     user_input = input(
-        "Please enter the requested mode - sequential or parallel (S / p): "
+        "Please enter the requested __mode - sequential or parallel ([s] / p): "
     )
 
     try:
-        if (user_input == 's' or user_input == 'S'):
+        if (user_input == 's') or (user_input == 'S'):
             mode = Population.mode_sequential
-        elif (user_input == 'p' or user_input == 'P'):
+        elif (user_input == 'p') or (user_input == 'P'):
             mode = Population.mode_parallel
         else:
             mode = standard_mode
     except ValueError:
         mode = standard_mode
 
-    print("Selected mode: " + mode)
+    print("Selected __mode: " + mode)
 
     return mode
 
@@ -91,44 +89,22 @@ if __name__ == '__main__':
     grid_size = __user_input_grid_size()
     mode = __user_input_mode()
 
+    print("")
     print("Program started")
+    print("")
 
     population = Population(grid_size, mode)
 
     fig, ax = mpl_pyplot.subplots()
 
     cmap = ListedColormap(['white', 'black'])
-    mat = ax.matshow(population.world, cmap=cmap)
+    mat = ax.matshow(population.get_world(), cmap=cmap)
 
     animation = mpl_animation.FuncAnimation(
         fig,
         update,
         interval=50
     )
-
-
-    #-------------------
-    borders = []
-    cpu_count = multiprocessing.cpu_count()
-
-    div, mod = divmod(grid_size, cpu_count)
-    if (mod == 0):
-        iterator = div
-    else:
-        iterator = div + 1
-
-    print(str(iterator))
-
-    for i in range(cpu_count + 1):
-        border = iterator * i
-        if (border <= grid_size):
-            borders.append(border)
-        else:
-            borders.append(grid_size)
-
-    print(borders)
-    #-------------------
-
 
     mpl_pyplot.show()
 
