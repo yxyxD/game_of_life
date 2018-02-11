@@ -13,6 +13,7 @@ class Population:
     standard_grid_size = 100
     mode_sequential = "sequential"
     mode_parallel = "parallel"
+    cpu_count = multiprocessing.cpu_count()
 
     ############################################################################
     #                           Constructor                                    #
@@ -25,14 +26,15 @@ class Population:
     def __init__(self, grid_size, mode):
         self.__grid_size = grid_size
         self.__mode = mode
+
         self.__calculation_time = 0
         self.__iteration_count = 0
         self.__world = numpy.random.randint(
             2,
             size=(grid_size, grid_size)
         )
-
         self.__new_world = []
+
         return
 
     ############################################################################
@@ -70,6 +72,13 @@ class Population:
 
     # @author   yxyxD
     # @changes
+    #       2018-02-11 (yxyxD) created
+    # @brief    Returns the amount of generations calculated per second.
+    def get_calculation_speed(self):
+        return  self.__iteration_count / self.__calculation_time
+
+    # @author   yxyxD
+    # @changes
     #       2018-02-09 (yxyxD) created
     # @brief    Returns the world of the current generation.
     def get_world(self):
@@ -95,40 +104,15 @@ class Population:
         self.__world = self.__new_world.copy()
 
         end_time = time.time()
-        self.__calculation_time += (end_time - start_time)
 
+        self.__calculation_time += (end_time - start_time)
         self.__iteration_count += 1
-        if self.__iteration_count % 20 == 0:
-            calculation_speed = self.__iteration_count / self.__calculation_time
-            print("Calculation speed = " + str(calculation_speed) + " iterations per second")
 
         return self.__world
 
     ############################################################################
     #                           Private Methods                                #
     ############################################################################
-    # @author   yxyxD
-    # @changes
-    #       2018-02-08 (yxyxD)  created
-    # @brief    Calculates one row of the next generation of the population.
-    def __get_next_row(self, x):
-        row = numpy.zeros(self.__grid_size)
-
-        for y in range(self.__grid_size):
-            neighbor_count = self.__get_neighbor_count(x, y)
-            if self.__world[x, y] == 1:
-                if neighbor_count < 2:
-                    row[y] = 0
-                elif neighbor_count == 2 or neighbor_count == 3:
-                    row[y] = 1
-                elif neighbor_count > 3:
-                    row[y] = 0
-            elif self.__world[x, y] == 0:
-                if neighbor_count == 3:
-                    row[y] = 1
-
-        return x, row
-
     # @author   yxyxD
     # @changes
     #       2018-02-08 (yxyxD)  created
