@@ -96,6 +96,8 @@ class Population:
 
         start_time = time.time()
 
+        self.__new_world = self.__world.copy()
+
         if self.__mode == self.mode_sequential:
             self.__calculate_next_generation_sequential()
         if self.__mode == self.mode_parallel:
@@ -121,7 +123,7 @@ class Population:
     # @brief    Calculates the next generation by calculating each row
     #           sequential.
     def __calculate_next_generation_sequential(self):
-        self.__new_world = self.__world.copy()
+        #self.__new_world = self.__world.copy()
 
         self.__calculate_section_of_world(0, self.__grid_size)
 
@@ -135,10 +137,10 @@ class Population:
     # @brief    Calculates the next generation by calculating each row
     #           parallel.
     def __calculate_next_generation_parallel(self):
-        self.__new_world = self.__world.copy()
+        #self.__new_world = self.__world.copy()
 
-        executor = ThreadPoolExecutor()
         min_borders, max_borders = self.__get_border_lists()
+        executor = ThreadPoolExecutor(min_borders.__len__())
         future_list = []
         for i in range(min_borders.__len__()):
             future_list.append(executor.submit(
