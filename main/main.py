@@ -5,6 +5,7 @@ import matplotlib.animation as mpl_animation
 
 from matplotlib.colors import ListedColormap
 
+from mpi4py import MPI
 
 ################################################################################
 #                           User Input Functions                               #
@@ -133,25 +134,38 @@ def update(data):
 #       2018-02-08 (yxyxD)  implemented user inputs for console
 # @brief    Starting point of the program.
 if __name__ == '__main__':
-    grid_size = __user_input_grid_size()
-    mode = __user_input_mode()
-    # @todo implement core number choice for parallel calculation
 
-    print("")
-    print("Program started")
-    print("")
+    mpi_size = MPI.COMM_WORLD.size
+    mpi_rank = MPI.COMM_WORLD.rank
 
-    population = Population(grid_size, mode)
+    if mpi_size > 1:
+        grid_size = Population.standard_grid_size
+        mode = Population.mode_mpi
+        if mpi_rank == 0:
+            print("using MPI with standard grid size: " + grid_size)
+            print("MPI size: " + mpi_size)
+    else:
+        grid_size = __user_input_grid_size()
+        mode = __user_input_mode()
+        # @todo implement core number choice for parallel calculation
 
-    fig, ax = mpl_pyplot.subplots()
 
-    cmap = ListedColormap(['white', 'black'])
-    mat = ax.matshow(population.get_world(), cmap=cmap)
+    if mpi_rank == 0:
+        print("")
+        print("Program started")
+        print("")
 
-    animation = mpl_animation.FuncAnimation(
-        fig,
-        update,
-        interval=50
-    )
+        population = Population(grid_size, mode)
 
-    mpl_pyplot.show()
+        fig, ax = mpl_pyplot.subplots()
+
+        cmap = ListedColormap(['white', 'black'])
+        mat = ax.matshow(population.get_world(), cmap=cmap)
+
+        animation = mpl_animation.FuncAnimation(
+            fig,
+            update,
+            interval=50
+        )
+
+        mpl_pyplot.show()
