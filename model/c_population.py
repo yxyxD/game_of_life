@@ -9,6 +9,7 @@ from concurrent.futures import wait
 
 from mpi4py import MPI
 
+
 class Population:
 
     standard_grid_size = 100
@@ -155,7 +156,6 @@ class Population:
 
         return
 
-
     # @author   marxmanEUW
     # @changes
     #       2018-02-13 (marxmanEUW)  created
@@ -166,15 +166,18 @@ class Population:
         mpi_comm = MPI.COMM_WORLD
 
         min_borders, max_borders = self.__get_border_lists_for_mpi()
-        #for i in range(min_borders.__len__()):
+        for i in range(min_borders.__len__()):
+            mpi_comm.send(self.__world, dest=(i + 1), tag=1)
+            mpi_comm.send(min_borders[i], dest=(i + 1), tag=2)
+            mpi_comm.send(max_borders[i], dest=(i + 1), tag=3)
 
-            # @todo
-            #self.__calculate_section_of_world()
-            #min_borders[i]
-            #max_borders[i]
+            new_partial_world = mpi_comm.recv(source=(i + 1), tag=4)
+
+            for x in range(min_borders[i], max_borders[i]):
+                for y in range(self.__grid_size):
+                    self.__new_world[x, y] = new_partial_world[x, y]
 
         return
-
 
     # @author   yxyxD
     # @changes
@@ -267,14 +270,10 @@ class Population:
     #           each MPI Process
     def __get_border_lists_for_mpi(self):
 
-        mpi_size = MPI.COMM_WORLD.size
+        mpi_size = MPI.COMM_WORLD.size - 1
 
         min_borders = []
         max_borders = []
-
-        # take one core less than available for better performance
-        # todo could be the key to get parallel to be faster than sequential
-        #cpu_count = multiprocessing.cpu_count() - 1
 
         div, mod = divmod(self.__grid_size, mpi_size)
         if mod == 0:

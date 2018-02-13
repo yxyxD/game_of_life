@@ -126,6 +126,53 @@ def update(data):
 
 
 ################################################################################
+#                           Test Methods                                       #
+################################################################################
+
+def __calculate_section_of_world_mpi(world_calc, x_min_calc, x_max_calc):
+
+    new_world_calc = world_calc.copy()
+
+    for x in range(x_min_calc, x_max_calc):
+        for y in range(world_calc.__len__()):
+            neighbor_count = __get_neighbor_count_mpi(world_calc, x, y)
+            if world_calc[x, y] == 1:
+                if neighbor_count < 2:
+                    new_world_calc[x, y] = 0
+                elif neighbor_count == 2 or neighbor_count == 3:
+                    new_world_calc[x, y] = 1
+                elif neighbor_count > 3:
+                    new_world_calc[x, y] = 0
+            elif world_calc[x, y] == 0:
+                if neighbor_count == 3:
+                    new_world_calc[x, y] = 1
+
+    return new_world_calc
+
+
+def __get_neighbor_count_mpi(world, x, y):
+    size = world.__len__()
+
+    count = 0
+
+    for i in [x - 1, x, x + 1]:
+        for j in [y - 1, y, y + 1]:
+
+            if (i == x) and (j == y):
+                continue
+
+            if (i != size) and (j != size):
+                count += world[i][j]
+            elif (i == size) and (j != size):
+                count += world[0][j]
+            elif (i != size) and (j == size):
+                count += world[i][0]
+            else:
+                count += world[0][0]
+
+    return count
+
+################################################################################
 #                           Starting Point                                     #
 ################################################################################
 # @author   yxyxD
@@ -135,20 +182,20 @@ def update(data):
 # @brief    Starting point of the program.
 if __name__ == '__main__':
 
-    mpi_size = MPI.COMM_WORLD.size
-    mpi_rank = MPI.COMM_WORLD.rank
+    mpi_comm = MPI.COMM_WORLD
+    mpi_size = mpi_comm.size
+    mpi_rank = mpi_comm.rank
 
     if mpi_size > 1:
         grid_size = Population.standard_grid_size
         mode = Population.mode_mpi
         if mpi_rank == 0:
-            print("using MPI with standard grid size: " + grid_size)
-            print("MPI size: " + mpi_size)
+            print("using MPI with standard grid size: " + str(grid_size))
+            print("MPI size: " + str(mpi_size))
     else:
         grid_size = __user_input_grid_size()
         mode = __user_input_mode()
         # @todo implement core number choice for parallel calculation
-
 
     if mpi_rank == 0:
         print("")
@@ -169,3 +216,19 @@ if __name__ == '__main__':
         )
 
         mpl_pyplot.show()
+    else:
+        print("oh, hi mark " + str(mpi_rank))
+        partial_world = mpi_comm.recv(source=0, tag=1)
+        x_min = mpi_comm.recv(source=0, tag=2)
+        x_max = mpi_comm.recv(source=0, tag=3)
+
+        print("partial_world" + str(mpi_rank))
+        print(partial_world)
+
+        new_partial_world = __calculate_section_of_world_mpi(partial_world, x_min, x_max)
+
+        print("new_partial_world" + str(mpi_rank))
+        print(new_partial_world)
+
+        mpi_comm.send(new_partial_world, dest=0, tag=4)
+
