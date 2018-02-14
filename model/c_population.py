@@ -7,12 +7,15 @@ from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import wait
 
+from mpi4py import MPI
+
 
 class Population:
 
     standard_grid_size = 100
     mode_sequential = "sequential"
     mode_parallel = "parallel"
+    mode_mpi = "mpi"
     cpu_count = multiprocessing.cpu_count()
 
     ############################################################################
@@ -102,6 +105,8 @@ class Population:
             self.__calculate_next_generation_sequential()
         if self.__mode == self.mode_parallel:
             self.__calculate_next_generation_parallel()
+        if self.__mode == self.mode_mpi:
+            self.__calculate_next_generation_mpi()
 
         self.__world = self.__new_world.copy()
 
@@ -148,6 +153,29 @@ class Population:
             ))
 
         wait(future_list)
+
+        return
+
+    # @author   marxmanEUW
+    # @changes
+    #       2018-02-13 (marxmanEUW)  created
+    # @brief    Calculates the next generation by calculating each row
+    #           parallel using mpi.
+    def __calculate_next_generation_mpi(self):
+
+        mpi_comm = MPI.COMM_WORLD
+
+        min_borders, max_borders = self.__get_border_lists_for_mpi()
+        for i in range(min_borders.__len__()):
+            mpi_comm.send(self.__world, dest=(i + 1), tag=1)
+            mpi_comm.send(min_borders[i], dest=(i + 1), tag=2)
+            mpi_comm.send(max_borders[i], dest=(i + 1), tag=3)
+
+            new_partial_world = mpi_comm.recv(source=(i + 1), tag=4)
+
+            for x in range(min_borders[i], max_borders[i]):
+                for y in range(self.__grid_size):
+                    self.__new_world[x, y] = new_partial_world[x, y]
 
         return
 
@@ -223,6 +251,37 @@ class Population:
             border = div + 1
 
         for i in range(cpu_count):
+            min_border = border * i
+            max_border = border * (i + 1)
+            if max_border > self.__grid_size:
+                max_border = self.__grid_size
+
+            min_borders.append(min_border)
+            max_borders.append(max_border)
+
+        return min_borders, max_borders
+
+    # @author   marxmanEUW
+    # @changes
+    #       2018-02-13 (marxmanEUW)  created
+    # @brief    Creates and returns two lists with borders for parallel
+    #           calculations. The first list contains the lower borders for
+    #           each MPI Process. The second list contains the upper borders for
+    #           each MPI Process
+    def __get_border_lists_for_mpi(self):
+
+        mpi_size = MPI.COMM_WORLD.size - 1
+
+        min_borders = []
+        max_borders = []
+
+        div, mod = divmod(self.__grid_size, mpi_size)
+        if mod == 0:
+            border = div
+        else:
+            border = div + 1
+
+        for i in range(mpi_size):
             min_border = border * i
             max_border = border * (i + 1)
             if max_border > self.__grid_size:
