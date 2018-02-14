@@ -1,4 +1,4 @@
 # Directories #
 ###############
-/.idea/*
-/venv/*
+.idea
+venv
