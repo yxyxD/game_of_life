@@ -1,6 +1,4 @@
-Inhalt von mein-machinfile:
-<IP-Addresse>
-EOF
+$ cat mein-machinefile
+localhost
 
-run mpi:
-$ mpirun -machinefile mein-machinefile -np <Anzahl der Processe> python3 main.py
+$ mpirun -machinefile mein-machinefile -np <number of processes> python3 main.py
