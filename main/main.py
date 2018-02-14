@@ -217,18 +217,12 @@ if __name__ == '__main__':
 
         mpl_pyplot.show()
     else:
-        print("oh, hi mark " + str(mpi_rank))
-        partial_world = mpi_comm.recv(source=0, tag=1)
-        x_min = mpi_comm.recv(source=0, tag=2)
-        x_max = mpi_comm.recv(source=0, tag=3)
+        while True:
+            partial_world = mpi_comm.recv(source=0, tag=1)
+            x_min = mpi_comm.recv(source=0, tag=2)
+            x_max = mpi_comm.recv(source=0, tag=3)
 
-        print("partial_world" + str(mpi_rank))
-        print(partial_world)
+            new_partial_world = __calculate_section_of_world_mpi(partial_world, x_min, x_max)
 
-        new_partial_world = __calculate_section_of_world_mpi(partial_world, x_min, x_max)
-
-        print("new_partial_world" + str(mpi_rank))
-        print(new_partial_world)
-
-        mpi_comm.send(new_partial_world, dest=0, tag=4)
+            mpi_comm.send(new_partial_world, dest=0, tag=4)
 

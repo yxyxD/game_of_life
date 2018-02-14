@@ -171,6 +171,7 @@ class Population:
             mpi_comm.send(min_borders[i], dest=(i + 1), tag=2)
             mpi_comm.send(max_borders[i], dest=(i + 1), tag=3)
 
+        for i in range(min_borders.__len__()):
             new_partial_world = mpi_comm.recv(source=(i + 1), tag=4)
 
             for x in range(min_borders[i], max_borders[i]):
