@@ -11,6 +11,7 @@ from mpi4py import MPI
 
 standard_grid_size = 100
 
+
 ################################################################################
 #                           User Output Functions                              #
 ################################################################################
@@ -59,6 +60,8 @@ def __calculate_next_generation():
 
     start_time = time.time()
 
+    new_world = world.copy()
+
     min_borders, max_borders = __get_border_lists_for_mpi()
     for i in range(min_borders.__len__()):
         mpi_comm.send(world, dest=(i + 1), tag=1)
@@ -89,7 +92,7 @@ def __calculate_section_of_world(start_x, end_x):
 
     for x in range(start_x, end_x):
         for y in range(standard_grid_size):
-            neighbor_count = __get_neighbor_count()
+            neighbor_count = __get_neighbor_count(x, y)
             if world[x, y] == 1:
                 if neighbor_count < 2:
                     new_world[x, y] = 0
@@ -163,7 +166,10 @@ def __get_border_lists_for_mpi():
 # @brief    Starting point of the program.
 if __name__ == '__main__':
 
-    global world
+    global world, calculation_time, iteration_count
+
+    calculation_time = 0
+    iteration_count = 0
 
     mpi_comm = MPI.COMM_WORLD
     mpi_size = mpi_comm.size
