@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import wait
 
 
-class Population:
+class Population2D:
 
     standard_grid_size = 100
     mode_sequential = "sequential"

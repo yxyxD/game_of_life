@@ -13,17 +13,13 @@ if __name__ == '__main__':
     ax.set_ylabel("y")
     ax.set_zlabel("z")
 
-    grid_size = 3
+    grid_size = 10
     data = numpy.random.randint(2, size=(grid_size, grid_size, grid_size))
-    # print(data)
-    # x, y, z = data.nonzero()
-    # ax.scatter(x, y, z, zdir='z', c='red')
 
     ax.set_xlim([0, grid_size])
     ax.set_ylim([0, grid_size])
     ax.set_zlim([0, grid_size])
 
-    d = 0.5
     for x in range(grid_size):
         for y in range(grid_size):
             for z in range(grid_size):
@@ -56,4 +52,5 @@ if __name__ == '__main__':
                         sides, facecolors='blue', linewidths=1, edgecolors='black'
                     ))
 
+    pyplot.axis('off')
     pyplot.show()
