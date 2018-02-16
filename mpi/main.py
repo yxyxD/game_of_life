@@ -18,6 +18,7 @@ standard_grid_size = 100
 # @author   yxyxD
 # @changes
 #       2018-02-11 (yxyxD)  created
+#       2018-02-15 (marxmanEUW)  modified for mpi
 # @brief    Prints the required calculation speed per generation.
 def __user_output_calculation_speed():
     global iteration_count, calculation_time
@@ -38,6 +39,7 @@ def __user_output_calculation_speed():
 # @author   yxyxD
 # @changes
 #       2018-02-07 (yxyxD)  created
+#       2018-02-15 (marxmanEUW)  modified for mpi
 # @brief    !!! IMPORTANT !!!
 #           Updates the data grid for the animation. Do not change location or
 #           parameter, unless you know what you are doing.
@@ -50,9 +52,14 @@ def update(data):
 
 
 ################################################################################
-#                           Test Methods                                       #
+#                           Public Methods                                     #
 ################################################################################
-
+# @author   yxyxD
+# @changes
+#       2018-02-07 (yxyxD)  created
+#       2018-02-15 (marxmanEUW)  modified for mpi
+# @brief    Creates and returns the grid of the next population. The
+#           population status of the object will be updated as well.
 def __calculate_next_generation():
     global world, new_world, iteration_count, calculation_time
 
@@ -62,7 +69,7 @@ def __calculate_next_generation():
 
     new_world = world.copy()
 
-    min_borders, max_borders = __get_border_lists_for_mpi()
+    min_borders, max_borders = __get_border_lists_for()
     for i in range(min_borders.__len__()):
         mpi_comm.send(world, dest=(i + 1), tag=1)
         mpi_comm.send(min_borders[i], dest=(i + 1), tag=2)
@@ -85,6 +92,12 @@ def __calculate_next_generation():
     return
 
 
+# @author   yxyxD
+# @changes
+#       2018-02-09 (yxyxD)  created
+#       2018-02-15 (marxmanEUW)  modified for mpi
+# @brief    Calculates a part of the new world (the rows between start_x and
+#           end_x).
 def __calculate_section_of_world(start_x, end_x):
     global world, new_world
 
@@ -109,6 +122,14 @@ def __calculate_section_of_world(start_x, end_x):
     return
 
 
+# @author   yxyxD
+# @changes
+#       2018-02-07 (yxyxD)  created
+#       2018-02-15 (marxmanEUW)  modified for mpi
+# @brief    Counts and returns the total amount of living neighbors of a
+#           cell. If the cell is on the edge of grid, cells on the other
+#           end of the grid count as neighbors too.
+# @todo     the counting logic for cells at the edge is most likely wrong
 def __get_neighbor_count(x, y):
     global world, new_world
 
@@ -132,7 +153,15 @@ def __get_neighbor_count(x, y):
     return count
 
 
-def __get_border_lists_for_mpi():
+# @author   yxyxD
+# @changes
+#       2018-02-09 (yxyxD)  created
+#       2018-02-15 (marxmanEUW)  modified for mpi
+# @brief    Creates and returns two lists with borders for parallel
+#           calculations. The first list contains the lower borders for
+#           each Thread. The second list contains the upper borders for
+#           each Thread
+def __get_border_lists_for():
 
     mpi_size = MPI.COMM_WORLD.size - 1
 
@@ -156,6 +185,7 @@ def __get_border_lists_for_mpi():
 
     return min_borders, max_borders
 
+
 ################################################################################
 #                           Starting Point                                     #
 ################################################################################
@@ -163,6 +193,7 @@ def __get_border_lists_for_mpi():
 # @changes
 #       2018-02-06 (yxyxD)  created
 #       2018-02-08 (yxyxD)  implemented user inputs for console
+#       2018-02-15 (marxmanEUW)  modified for mpi
 # @brief    Starting point of the program.
 if __name__ == '__main__':
 
