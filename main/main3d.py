@@ -133,7 +133,7 @@ def update(data):
     ax.set_zlabel("z")
 
     world = population.create_and_return_next_generation()
-    print(world)
+    # print(world)
 
     for x in range(population.get_grid_size()):
         for y in range(population.get_grid_size()):
@@ -151,8 +151,6 @@ def update(data):
                         [(x + 1), (y + 1), (z + 1)]     # [7] up upper right
                     ])
 
-                    # pprint.PrettyPrinter().pprint(points)
-
                     sides = [
                         [points[0], points[1], points[3], points[2]],   # bottom
                         [points[0], points[1], points[5], points[4]],   # front
@@ -166,6 +164,8 @@ def update(data):
                     ax.add_collection3d(Poly3DCollection(
                         sides, facecolors='blue', linewidths=1, edgecolors='black'
                     ))
+
+    __user_output_calculation_speed()
 
     return
 

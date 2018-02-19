@@ -163,14 +163,20 @@ class Population3D:
                 for z in range(self.__grid_size):
 
                     # @todo search for best rules
+                    # working set -> to many living cells
+                    #   >= 4; <= 8
+                    #   >= 6; <= 8
+                    # working set -> dynamic
+                    #   >= 4; <= 7
+                    #   >= 6; <= 8
                     neighbor_count = self.__get_neighbor_count(x, y, z)
                     if self.__world[x, y, z] == 1:
-                        if (neighbor_count >= 4) and (neighbor_count <= 8):
+                        if (neighbor_count >= 2) and (neighbor_count <= 4):
                             self.__new_world[x, y, z] = 1
                         else:
                             self.__new_world[x, y, z] = 0
                     elif self.__world[x, y, z] == 0:
-                        if (neighbor_count >= 6) and (neighbor_count <= 8):
+                        if (neighbor_count >= 5) and (neighbor_count <= 6):
                             self.__new_world[x, y, z] = 1
 
         return
@@ -181,7 +187,6 @@ class Population3D:
     # @brief    Counts and returns the total amount of living neighbors of a
     #           cell. If the cell is on the edge of grid, cells on the other
     #           end of the grid count as neighbors too.
-    # @todo     the counting logic for cells at the edge is most likely wrong
     def __get_neighbor_count(self, x, y, z):
         count = 0
 
@@ -192,18 +197,16 @@ class Population3D:
                     if (i == x) and (j == y) and (z == k):
                         continue
 
-                    x_new = i
-                    y_new = j
-                    z_new = k
-
                     if i == self.__grid_size:
-                        x_new = 0
-                    if j == self.__grid_size:
-                        y_new = 0
-                    if k == self.__grid_size:
-                        z_new = 0
+                        continue
 
-                    count += self.__world[x_new][y_new][z_new]
+                    if j == self.__grid_size:
+                        continue
+
+                    if k == self.__grid_size:
+                        continue
+
+                    count += self.__world[i][j][k]
 
         return count
 
