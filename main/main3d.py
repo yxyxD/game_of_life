@@ -1,9 +1,13 @@
-from model.c_population import Population
+from model.c_population3d import Population3D
 
-import matplotlib.pyplot as mpl_pyplot
+import pprint
+import numpy
+from matplotlib import pyplot
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as mpl_animation
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 
-from matplotlib.colors import ListedColormap
+from matplotlib import patches
 
 ################################################################################
 #                           User Input Functions                               #
@@ -14,7 +18,7 @@ from matplotlib.colors import ListedColormap
 # @brief    Requests the grid size from the user. If the input is incorrect
 #           the standard_grid_size will be used instead.
 def __user_input_grid_size():
-    standard_grid_size = Population.standard_grid_size
+    standard_grid_size = Population3D.standard_grid_size
 
     user_input = input(
         "Please enter the grid size [" + str(standard_grid_size) + "]: "
@@ -40,7 +44,7 @@ def __user_input_grid_size():
 # @brief    Requests the calculation __mode from the user. If the input is
 #           incorrect the standard_mode will be used instead.
 def __user_input_mode():
-    standard_mode = Population.mode_sequential
+    standard_mode = Population3D.mode_sequential
 
     user_input = input(
         "Please enter the requested __mode - sequential or parallel ([s] / p): "
@@ -48,9 +52,9 @@ def __user_input_mode():
 
     try:
         if (user_input == 's') or (user_input == 'S'):
-            mode = Population.mode_sequential
+            mode = Population3D.mode_sequential
         elif (user_input == 'p') or (user_input == 'P'):
-            mode = Population.mode_parallel
+            mode = Population3D.mode_parallel
         else:
             mode = standard_mode
     except ValueError:
@@ -67,7 +71,7 @@ def __user_input_mode():
 #           parallel caluclation from the user
 def __user_input_cores_for_parallel_calculation():
     min_cores = 2
-    max_cores = Population.cpu_count
+    max_cores = Population3D.cpu_count
 
     user_input = input(
         "Please enter the number of cores that shall be used for the parallel calculation "
@@ -118,9 +122,52 @@ def __user_output_calculation_speed():
 #           parameter, unless you know what you are doing.
 def update(data):
 
-    mat.set_data(population.create_and_return_next_generation())
-    __user_output_calculation_speed()
-    return [mat]
+    pyplot.cla()
+
+    ax.set_xlim([0, grid_size])
+    ax.set_ylim([0, grid_size])
+    ax.set_zlim([0, grid_size])
+
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
+
+    world = population.create_and_return_next_generation()
+    print(world)
+
+    for x in range(population.get_grid_size()):
+        for y in range(population.get_grid_size()):
+            for z in range(population.get_grid_size()):
+
+                if world[x][y][z] == 1:
+                    points = numpy.array([
+                        [(x),     (y),     (z)],        # [0] down lower left
+                        [(x + 1), (y),     (z)],        # [1] down lower right
+                        [(x),     (y + 1), (z)],        # [2] down upper left
+                        [(x + 1), (y + 1), (z)],        # [3] down upper right
+                        [(x),     (y),     (z + 1)],    # [4] up lower left
+                        [(x + 1), (y),     (z + 1)],    # [5] up lower right
+                        [(x),     (y + 1), (z + 1)],    # [6] up upper left
+                        [(x + 1), (y + 1), (z + 1)]     # [7] up upper right
+                    ])
+
+                    # pprint.PrettyPrinter().pprint(points)
+
+                    sides = [
+                        [points[0], points[1], points[3], points[2]],   # bottom
+                        [points[0], points[1], points[5], points[4]],   # front
+                        [points[0], points[2], points[6], points[4]],   # left
+                        [points[1], points[3], points[7], points[5]],   # right
+                        [points[2], points[3], points[7], points[6]],   # back
+                        [points[4], points[5], points[7], points[6]]    # top
+                    ]
+
+                    # ax.scatter3D(points[:, 0], points[:, 1], points[:, 2])
+                    ax.add_collection3d(Poly3DCollection(
+                        sides, facecolors='blue', linewidths=1, edgecolors='black'
+                    ))
+
+    return
 
 
 ################################################################################
@@ -141,12 +188,10 @@ if __name__ == '__main__':
     print("Program started")
     print("")
 
-    population = Population(grid_size, mode)
+    population = Population3D(grid_size, mode)
 
-    fig, ax = mpl_pyplot.subplots()
-
-    cmap = ListedColormap(['white', 'black'])
-    mat = ax.matshow(population.get_world(), cmap=cmap)
+    fig = pyplot.figure()
+    ax = Axes3D(fig)
 
     animation = mpl_animation.FuncAnimation(
         fig,
@@ -154,5 +199,4 @@ if __name__ == '__main__':
         interval=50
     )
 
-    mpl_pyplot.show()
-
+    pyplot.show()
