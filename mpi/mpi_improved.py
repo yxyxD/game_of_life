@@ -70,10 +70,10 @@ def __calculate_next_generation():
     new_world = world.copy()
 
     min_borders, max_borders = __get_border_lists_for()
-    for i in range(min_borders.__len__()):
-        mpi_comm.send(world, dest=(i + 1), tag=1)
-        mpi_comm.send(min_borders[i], dest=(i + 1), tag=2)
-        mpi_comm.send(max_borders[i], dest=(i + 1), tag=3)
+    # for i in range(min_borders.__len__()):
+        # mpi_comm.send(world, dest=(i + 1), tag=1)
+        # mpi_comm.send(min_borders[i], dest=(i + 1), tag=2)
+        # mpi_comm.send(max_borders[i], dest=(i + 1), tag=3)
 
     for i in range(min_borders.__len__()):
         new_partial_world = mpi_comm.recv(source=(i + 1), tag=4)
@@ -233,12 +233,15 @@ if __name__ == '__main__':
 
         mpl_pyplot.show()
     else:
-        while True:
-            world = mpi_comm.recv(source=0, tag=1)
-            start_x = mpi_comm.recv(source=0, tag=2)
-            end_x = mpi_comm.recv(source=0, tag=3)
 
+        world = mpi_comm.recv(source=0, tag=1)
+        start_x = mpi_comm.recv(source=0, tag=2)
+        end_x = mpi_comm.recv(source=0, tag=3)
+
+        while True:
             __calculate_section_of_world(start_x, end_x)
 
             mpi_comm.send(world, dest=0, tag=4)
+
+            mpi_comm.send(world[start_x], dest=(mpi_rank - 1))
 
