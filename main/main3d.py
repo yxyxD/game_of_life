@@ -1,13 +1,16 @@
 from model.c_population3d import Population3D
 
-import pprint
 import numpy
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as mpl_animation
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-from matplotlib import patches
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import threadsafe_tkinter as tk
+import sys
+
 
 ################################################################################
 #                           User Input Functions                               #
@@ -170,6 +173,10 @@ def update(data):
     return
 
 
+def quit():
+    sys.exit()
+
+
 ################################################################################
 #                           Starting Point                                     #
 ################################################################################
@@ -190,7 +197,16 @@ if __name__ == '__main__':
 
     population = Population3D(grid_size, mode)
 
+    root = tk.Tk()
+
+    label = tk.Label(root, text="SHM Simulation").grid(column=0, row=0)
+
     fig = pyplot.figure()
+    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas.get_tk_widget().grid(column=0, row=1)
+
+    tk.Button(root, text="Quit", command=quit).grid(column=1, row=1)
+
     ax = Axes3D(fig)
 
     animation = mpl_animation.FuncAnimation(
@@ -199,4 +215,6 @@ if __name__ == '__main__':
         interval=50
     )
 
-    pyplot.show()
+    # pyplot.show()
+
+    tk.mainloop()
