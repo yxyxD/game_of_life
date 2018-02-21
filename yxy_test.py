@@ -2,25 +2,37 @@ from view.c_main_frame import MainFrame
 import matplotlib.animation as mpl_animation
 import numpy
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+import threadsafe_tkinter as Tkinter
+import threading
+
+
+def animate_thread(data):
+
+    threading.Thread(target=animate, args=(data,)).start()
+
+    return
 
 
 def animate(data):
 
-    mainframe.clearAxes()
+    if plot3d.is_paused:
+        return
 
-    mainframe.ax.set_xlim([0, mainframe.grid_size])
-    mainframe.ax.set_ylim([0, mainframe.grid_size])
-    mainframe.ax.set_zlim([0, mainframe.grid_size])
+    plot3d.clear_axes()
 
-    mainframe.ax.set_xlabel("x")
-    mainframe.ax.set_ylabel("y")
-    mainframe.ax.set_zlabel("z")
+    plot3d.axis.set_xlim([0, plot3d.population.get_grid_size()])
+    plot3d.axis.set_ylim([0, plot3d.population.get_grid_size()])
+    plot3d.axis.set_zlim([0, plot3d.population.get_grid_size()])
 
-    world = mainframe.population.create_and_return_next_generation()
+    plot3d.axis.set_xlabel("x")
+    plot3d.axis.set_ylabel("y")
+    plot3d.axis.set_zlabel("z")
 
-    for x in range(mainframe.population.get_grid_size()):
-        for y in range(mainframe.population.get_grid_size()):
-            for z in range(mainframe.population.get_grid_size()):
+    world = plot3d.population.create_and_return_next_generation()
+
+    for x in range(plot3d.population.get_grid_size()):
+        for y in range(plot3d.population.get_grid_size()):
+            for z in range(plot3d.population.get_grid_size()):
 
                 if world[x][y][z] == 1:
                     points = numpy.array([
@@ -43,19 +55,24 @@ def animate(data):
                         [points[4], points[5], points[7], points[6]]    # top
                     ]
 
-                    mainframe.ax.add_collection3d(Poly3DCollection(
+                    plot3d.axis.add_collection3d(Poly3DCollection(
                         sides, facecolors='blue', linewidths=1, edgecolors='black'
                     ))
+
+    return
 
 
 if __name__ == '__main__':
 
-    mainframe = MainFrame()
+    root = Tkinter.Tk()
+    root.wm_title("Game of life")
+
+    plot3d = MainFrame(root)
 
     animation = mpl_animation.FuncAnimation(
-        mainframe.fig,
+        plot3d.figure,
         animate,
         interval=50
     )
 
-    mainframe.mainloop()
+    root.mainloop()
