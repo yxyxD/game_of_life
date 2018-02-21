@@ -97,6 +97,7 @@ def __setup_animation():
 
     return animation
 
+
 if __name__ == '__main__':
 
     population_type = Inputs.user_input_population_type()
