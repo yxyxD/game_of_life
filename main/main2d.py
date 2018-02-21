@@ -1,3 +1,6 @@
+################################################################################
+#                   @TODO obsolete Klasse
+################################################################################
 from model.c_population2d import Population2D
 
 import matplotlib.pyplot as mpl_pyplot

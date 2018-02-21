@@ -1,11 +1,41 @@
+from model.c_population2d import Population2D
 from model.c_population3d import Population3D
 
 
 class Inputs:
 
     @staticmethod
-    def user_input_grid_size():
-        standard_grid_size = Population3D.standard_grid_size
+    def user_input_population_type():
+
+        standard_population_type = Population3D.population_type
+
+        user_input = input(
+            "Please enter the population type (["
+            + standard_population_type + "] / "
+            + Population2D.population_type + " ): "
+        )
+
+        try:
+            if user_input == Population3D.population_type:
+                population_type = Population3D.population_type
+            elif user_input == Population2D.population_type:
+                population_type = Population2D.population_type
+            else:
+                population_type = standard_population_type
+        except ValueError:
+            population_type = standard_population_type
+
+        print("Selected population type: " + population_type)
+
+        return population_type
+
+    @staticmethod
+    def user_input_grid_size(population_type):
+
+        if population_type == Population3D.population_type:
+            standard_grid_size = Population3D.standard_grid_size
+        else:
+            standard_grid_size = Population2D.standard_grid_size
 
         user_input = input(
             "Please enter the grid size [" + str(standard_grid_size) + "]: "
@@ -25,8 +55,12 @@ class Inputs:
         return grid_size
 
     @staticmethod
-    def user_input_mode():
-        standard_mode = Population3D.mode_sequential
+    def user_input_mode(population_type):
+
+        if population_type == Population3D.population_type:
+            standard_mode = Population3D.mode_sequential
+        else:
+            standard_mode = Population2D.mode_sequential
 
         user_input = input(
             "Please enter the requested __mode - sequential or parallel ([s] / p): "

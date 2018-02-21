@@ -10,6 +10,7 @@ from concurrent.futures import wait
 
 class Population2D:
 
+    population_type = "2d"
     standard_grid_size = 100
     mode_sequential = "sequential"
     mode_parallel = "parallel"
