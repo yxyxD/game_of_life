@@ -1,7 +1,6 @@
 import numpy
 import multiprocessing
 import time
-
 from multiprocessing import Pool
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
@@ -17,6 +16,10 @@ class Population:
     ############################################################################
     #                           Constructor                                    #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-07 (yxyxD)  created
+    # @brief    Creates a new population with randomly placed bacteria.
     def __init__(self, grid_size, mode):
 
         self._grid_size = grid_size
@@ -28,43 +31,84 @@ class Population:
         self._iteration_count = 0
         self._calculation_time = 0
 
-        self._setup_world_with_population()
+        self._setup_first_generation()
 
         return
 
     ############################################################################
     #                           Child Implementations                          #
     ############################################################################
-    def _setup_world_with_population(self):
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Child classes need to implement this method to set up the first
+    #           generation of the world.
+    def _setup_first_generation(self):
         raise NotImplementedError
 
-    def _calculate_section_of_world(self, x_min, x_max):
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Child classes need to implement this method to calculate a
+    #           section of the next generation
+    def _calculate_section_of_new_world(self, x_min, x_max):
         raise NotImplementedError
 
     ############################################################################
     #                           Getter Methods                                 #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD) created
+    # @brief    Returns the grid size of the world.
     def get_grid_size(self):
         return self._grid_size
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD) created
+    # @brief    Returns the calculation mode in which the next generations are
+    #           calculated (either sequential or parallel).
     def get_mode(self):
         return self._mode
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD) created
+    # @brief    Returns the world of the current generation.
     def get_world(self):
         return self._world
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD) created
+    # @brief    Returns the total amount of generations calculated.
     def get_iteration_count(self):
         return self._iteration_count
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD) created
+    # @brief    Returns the total amount of time taken for all operations
+    #           regarding the calculation of the next generation.
     def get_calculation_time(self):
         return self._calculation_time
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD) created
+    # @brief    Returns the amount of generations calculated per second.
     def get_calculation_speed(self):
         return self._iteration_count / self._calculation_time
 
     ############################################################################
     #                           Public Methods                                 #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-07 (yxyxD)  created
+    # @brief    Creates and returns the grid of the next population. The
+    #           population status of the object will be updated as well.
     def create_and_return_next_generation(self):
 
         start_time = time.time()
@@ -88,12 +132,22 @@ class Population:
     ############################################################################
     #                           Private Methods                                #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Calculates the next generation by calculating each row
+    #           sequential.
     def _calculate_next_generation_sequential(self):
 
-        self._calculate_section_of_world(0, self._grid_size)
+        self._calculate_section_of_new_world(0, self._grid_size)
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Calculates the next generation by calculating each row
+    #           parallel.
     def _calculate_next_generation_parallel(self):
 
         min_borders, max_borders = self._get_border_lists()
@@ -101,7 +155,7 @@ class Population:
         future_list = []
         for i in range(min_borders.__len__()):
             future_list.append(executor.submit(
-                self._calculate_section_of_world,
+                self._calculate_section_of_new_world,
                 min_borders[i],
                 max_borders[i]
             ))
@@ -110,6 +164,13 @@ class Population:
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Creates and returns two lists with borders for parallel
+    #           calculations. The first list contains the lower borders for
+    #           each Thread. The second list contains the upper borders for
+    #           each Thread
     def _get_border_lists(self):
         min_borders = []
         max_borders = []

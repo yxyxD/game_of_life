@@ -1,6 +1,6 @@
-from model.c_population import Population
-
 import numpy
+
+from model.c_population import Population
 
 
 class Population2D(Population):
@@ -8,13 +8,27 @@ class Population2D(Population):
     population_type = "2d"
     standard_grid_size = 100
 
+    ############################################################################
+    #                           Constructor                                    #
+    ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Creates a new 2D population with randomly placed bacteria.
     def __init__(self, grid_size, mode):
 
         super().__init__(grid_size, mode)
 
         return
 
-    def _setup_world_with_population(self):
+    ############################################################################
+    #                           Required Implementations                       #
+    ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Randomly generates the first generation of the world.
+    def _setup_first_generation(self):
 
         self._world = numpy.random.randint(
             2,
@@ -23,7 +37,12 @@ class Population2D(Population):
 
         return
 
-    def _calculate_section_of_world(self, x_min, x_max):
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Calculates a part of the new world (the rows between x_min and
+    #           x_max).
+    def _calculate_section_of_new_world(self, x_min, x_max):
 
         for x in range(x_min, x_max):
             for y in range(self._grid_size):
@@ -41,6 +60,15 @@ class Population2D(Population):
 
         return
 
+    ############################################################################
+    #                           Private Methods                                #
+    ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-07 (yxyxD)  created
+    # @brief    Counts and returns the total amount of living neighbors of a
+    #           cell. If the cell is on the edge of grid, cells on the beginning
+    #           of the grid count as neighbors too.
     def _get_neighbor_count(self, x, y):
         count = 0
 

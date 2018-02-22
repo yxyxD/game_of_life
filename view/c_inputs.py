@@ -1,9 +1,14 @@
-from old.c_population2d import Population2D
-from old.c_population3d import Population3D
+from model.c_population import Population
+from model.c_population2d import Population2D
+from model.c_population3d import Population3D
 
 
 class Inputs:
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Requests the population type (2d or 3d) from the user.
     @staticmethod
     def user_input_population_type():
 
@@ -29,6 +34,10 @@ class Inputs:
 
         return population_type
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Requests the grid size from the user.
     @staticmethod
     def user_input_grid_size(population_type):
 
@@ -54,13 +63,15 @@ class Inputs:
 
         return grid_size
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Requests the calculation mode (parallel, sequential) form the
+    #           user.
     @staticmethod
-    def user_input_mode(population_type):
+    def user_input_mode():
 
-        if population_type == Population3D.population_type:
-            standard_mode = Population3D.mode_sequential
-        else:
-            standard_mode = Population2D.mode_sequential
+        standard_mode = Population.mode_sequential
 
         user_input = input(
             "Please enter the requested __mode - sequential or parallel ([s] / p): "
@@ -68,9 +79,9 @@ class Inputs:
 
         try:
             if (user_input == 's') or (user_input == 'S'):
-                mode = Population3D.mode_sequential
+                mode = Population.mode_sequential
             elif (user_input == 'p') or (user_input == 'P'):
-                mode = Population3D.mode_parallel
+                mode = Population.mode_parallel
             else:
                 mode = standard_mode
         except ValueError:

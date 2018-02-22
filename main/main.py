@@ -1,15 +1,21 @@
-from view.c_main_frame import MainFrame
-import matplotlib.animation as mpl_animation
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import threadsafe_tkinter as Tkinter
-from view.c_inputs import Inputs
-
 import numpy
+import matplotlib.animation as mpl_animation
+import threadsafe_tkinter as Tkinter
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from model.c_population2d import Population2D
 from model.c_population3d import Population3D
+from view.c_inputs import Inputs
+from view.c_main_frame import MainFrame
 
 
+################################################################################
+#                           Update functions                                   #
+################################################################################
+# @author   yxyxD
+# @changes
+#       2018-02-21 (yxyxD)  created
+# @brief    Update function for 2-dimensional populations.
 def animate_2d(data):
 
     if main_frame.is_paused:
@@ -21,6 +27,10 @@ def animate_2d(data):
     return [main_frame.mat]
 
 
+# @author   yxyxD
+# @changes
+#       2018-02-21 (yxyxD)  created
+# @brief    Update fuction for 3-dimensional populations.
 def animate_3d(data):
 
     if main_frame.is_paused:
@@ -72,10 +82,17 @@ def animate_3d(data):
     return
 
 
+################################################################################
+#                           Private Functions                                  #
+################################################################################
+# @author   yxyxD
+# @changes
+#       2018-02-21 (yxyxD)  created
+# @brief    Creates the population based on user inputs.
 def __setup_population():
 
     grid_size = Inputs.user_input_grid_size(population_type)
-    mode = Inputs.user_input_mode(population_type)
+    mode = Inputs.user_input_mode()
 
     if population_type == Population3D.population_type:
         population = Population3D(grid_size, mode)
@@ -85,6 +102,10 @@ def __setup_population():
     return population
 
 
+# @author   yxyxD
+# @changes
+#       2018-02-21 (yxyxD)  created
+# @brief    Creates the animation based on the type of the population.
 def __setup_animation():
 
     if population_type == Population3D.population_type:
@@ -103,6 +124,13 @@ def __setup_animation():
     return animation
 
 
+################################################################################
+#                           Main                                               #
+################################################################################
+# @author   yxyxD
+# @changes
+#       2018-02-21 (yxyxD)  created
+# @brief    Main method.
 if __name__ == '__main__':
 
     population_type = Inputs.user_input_population_type()

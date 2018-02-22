@@ -1,13 +1,12 @@
-from old.c_population3d import Population3D
-from old.c_population2d import Population2D
-
-from matplotlib import pyplot
-from mpl_toolkits.mplot3d import Axes3D
-
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threadsafe_tkinter as Tkinter
 import sys
+from matplotlib import pyplot
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.colors import ListedColormap
+
+from model.c_population3d import Population3D
+from model.c_population2d import Population2D
 
 
 class MainFrame(Tkinter.Frame):
@@ -15,6 +14,10 @@ class MainFrame(Tkinter.Frame):
     ############################################################################
     #                           Constructor                                    #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Creates a new MainFrame to display a population.
     def __init__(self, root, population, *args, **kwargs):
 
         Tkinter.Frame.__init__(self, root, *args, **kwargs)
@@ -38,6 +41,10 @@ class MainFrame(Tkinter.Frame):
     ############################################################################
     #                           Initialising                                   #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Initialises the plot to display a 3-dimensional population.
     def __init_plot3d(self):
 
         self.figure = pyplot.figure()
@@ -49,6 +56,10 @@ class MainFrame(Tkinter.Frame):
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Initialises the plot to display a 2-dimensional population
     def __init_plot2d(self):
 
         self.figure = pyplot.figure()
@@ -63,6 +74,10 @@ class MainFrame(Tkinter.Frame):
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Initialises the buttons.
     def __init_buttons(self):
 
         self.button_pause = Tkinter.Button(
@@ -88,6 +103,10 @@ class MainFrame(Tkinter.Frame):
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Initialises the labels.
     def __init_labels(self):
 
         self.label_info_grid_size = Tkinter.Label(
@@ -135,6 +154,11 @@ class MainFrame(Tkinter.Frame):
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Initialises the layout by placing every GUI-component on the
+    #           MainFrame.
     def __init_layout(self):
 
         self.button_quit.grid(row=0, column=10)
@@ -177,29 +201,50 @@ class MainFrame(Tkinter.Frame):
     ############################################################################
     #                           Private Methods                                #
     ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Pauses the animation of the population development.
     def __pause(self):
 
         self.is_paused = True
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Continues the animation of a paused population development.
     def __continue(self):
 
         self.is_paused = False
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Restarts the population development by setting up a new randomly
+    #           created generation.
+    # @todo only for 3d now => make for 2d
     def __restart(self):
 
         old_grid_size = self.population.get_grid_size()
         old_mode = self.population.get_mode()
 
-        self.population = Population3D(old_grid_size, old_mode)
+        if self.population.__class__.population_type == Population3D.population_type:
+            self.population = Population3D(old_grid_size, old_mode)
+        if self.population.__class__.population_type == Population2D.population_type:
+            self.population = Population2D(old_grid_size, old_mode)
 
-        self.is_paused = False
+        self.__continue()
 
         return
 
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD)  created
+    # @brief    Ends the program.
     def __quit(self):
 
         sys.exit()
