@@ -1,15 +1,10 @@
-from model.c_population3d import Population3D
-from model.c_population2d import Population2D
+from old.c_population3d import Population3D
+from old.c_population2d import Population2D
 
-import numpy
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.animation as mpl_animation
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.backends.backend_tkagg import NavigationToolbar2TkAgg
-from matplotlib.figure import Figure
 import threadsafe_tkinter as Tkinter
 import sys
 from matplotlib.colors import ListedColormap

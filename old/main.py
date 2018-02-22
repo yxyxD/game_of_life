@@ -1,19 +1,14 @@
 from view.c_main_frame import MainFrame
 import matplotlib.animation as mpl_animation
+import numpy
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import threadsafe_tkinter as Tkinter
 from view.c_inputs import Inputs
-
-import numpy
-
-from model.c_population2d import Population2D
-from model.c_population3d import Population3D
+from old.c_population3d import Population3D
+from old.c_population2d import Population2D
 
 
 def animate_2d(data):
-
-    if main_frame.is_paused:
-        return
 
     main_frame.mat.set_data(main_frame.population.create_and_return_next_generation())
     main_frame.update_population_status()
