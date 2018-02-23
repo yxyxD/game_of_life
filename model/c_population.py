@@ -9,8 +9,8 @@ from concurrent.futures import wait
 
 class Population:
 
-    mode_sequential = "sequential"
-    mode_parallel = "parallel"
+    mode_sequential = "seq"
+    mode_parallel = "par"
     cpu_count = multiprocessing.cpu_count()
 
     ############################################################################

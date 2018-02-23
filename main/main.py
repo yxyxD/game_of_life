@@ -138,7 +138,6 @@ if __name__ == '__main__':
     population = __setup_population()
 
     root = Tkinter.Tk()
-    root.wm_title("Game of life")
 
     main_frame = MainFrame(root, population)
 
