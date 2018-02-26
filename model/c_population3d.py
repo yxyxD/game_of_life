@@ -56,14 +56,14 @@ class Population3D(Population):
                     #   >= 4; <= 7
                     #   >= 6; <= 8
                     neighbor_count = self._get_neighbor_count(x, y, z)
-                    if self._world[x, y, z] == 1:
+                    if self._world[x][y][z] == 1:
                         if (neighbor_count >= 2) and (neighbor_count <= 4):
-                            self._new_world[x, y, z] = 1
+                            self._new_world[x][y][z] = 1
                         else:
-                            self._new_world[x, y, z] = 0
-                    elif self._world[x, y, z] == 0:
+                            self._new_world[x][y][z] = 0
+                    elif self._world[x][y][z] == 0:
                         if (neighbor_count >= 5) and (neighbor_count <= 6):
-                            self._new_world[x, y, z] = 1
+                            self._new_world[x][y][z] = 1
 
         return
 

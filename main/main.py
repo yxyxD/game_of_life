@@ -24,7 +24,7 @@ def animate_2d(data):
     main_frame.mat.set_data(main_frame.population.create_and_return_next_generation())
     main_frame.update_population_status()
 
-    return [main_frame.mat]
+    return
 
 
 # @author   yxyxD
@@ -134,13 +134,10 @@ def __setup_animation():
 if __name__ == '__main__':
 
     population_type = Inputs.user_input_population_type()
-
     population = __setup_population()
 
     root = Tkinter.Tk()
-
     main_frame = MainFrame(root, population)
-
     animation = __setup_animation()
 
     root.mainloop()
