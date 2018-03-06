@@ -8,7 +8,6 @@ import time
 
 from mpi4py import MPI
 
-
 standard_grid_size = 100
 
 
@@ -26,8 +25,8 @@ def __user_output_calculation_speed():
     if iteration_count % 5 == 0:
         print(
             "Calculation speed = "
-              + str(round((iteration_count / calculation_time), 5))
-              + " iteration(s) per second"
+            + str(round((iteration_count / calculation_time), 5))
+            + " iteration(s) per second"
         )
 
     return
@@ -44,7 +43,6 @@ def __user_output_calculation_speed():
 #           Updates the data grid for the animation. Do not change location or
 #           parameter, unless you know what you are doing.
 def update(data):
-
     __calculate_next_generation()
     mat.set_data(world)
     __user_output_calculation_speed()
@@ -70,10 +68,6 @@ def __calculate_next_generation():
     new_world = world.copy()
 
     min_borders, max_borders = __get_border_lists_for()
-    # for i in range(min_borders.__len__()):
-        # mpi_comm.send(world, dest=(i + 1), tag=1)
-        # mpi_comm.send(min_borders[i], dest=(i + 1), tag=2)
-        # mpi_comm.send(max_borders[i], dest=(i + 1), tag=3)
 
     for i in range(min_borders.__len__()):
         new_partial_world = mpi_comm.recv(source=(i + 1), tag=4)
@@ -162,7 +156,6 @@ def __get_neighbor_count(x, y):
 #           each Thread. The second list contains the upper borders for
 #           each Thread
 def __get_border_lists_for():
-
     mpi_size = MPI.COMM_WORLD.size - 1
 
     min_borders = []
@@ -184,6 +177,48 @@ def __get_border_lists_for():
         max_borders.append(max_border)
 
     return min_borders, max_borders
+
+
+def __get_previous_mpi_rank():
+    mpi_size = MPI.COMM_WORLD.size
+    mpi_rank = MPI.COMM_WORLD.rank
+
+    previous_mpi_rank = mpi_rank - 1
+
+    if (previous_mpi_rank <= 0):
+        previous_mpi_rank = (mpi_size - 1)
+
+    return previous_mpi_rank
+
+
+def __get_next_mpi_rank():
+    mpi_size = MPI.COMM_WORLD.size
+    mpi_rank = MPI.COMM_WORLD.rank
+
+    next_mpi_rank = mpi_rank + 1
+
+    if (next_mpi_rank >= mpi_size):
+        next_mpi_rank = 1
+
+    return next_mpi_rank
+
+
+def __get_start_row_minus_one_index(start_x):
+    start_row_minus_one_index = start_x - 1
+
+    if (start_row_minus_one_index <= 0):
+        start_row_minus_one_index = standard_grid_size - 1
+
+    return start_row_minus_one_index
+
+
+def __get_end_row_plus_one_index(end_x):
+    get_end_row_plus_one_index = end_x + 1
+
+    if (get_end_row_plus_one_index >= standard_grid_size):
+        get_end_row_plus_one_index = 0
+
+    return get_end_row_plus_one_index
 
 
 ################################################################################
@@ -232,7 +267,16 @@ if __name__ == '__main__':
         )
 
         mpl_pyplot.show()
+
+        min_borders, max_borders = __get_border_lists_for()
+        for i in range(min_borders.__len__()):
+            mpi_comm.send(world, dest=(i + 1), tag=1)
+            mpi_comm.send(min_borders[i], dest=(i + 1), tag=2)
+            mpi_comm.send(max_borders[i], dest=(i + 1), tag=3)
+
     else:
+        print("previous_mpi_rank" + str(__get_previous_mpi_rank()))
+        print("next_mpi_rank" + str(__get_next_mpi_rank()))
 
         world = mpi_comm.recv(source=0, tag=1)
         start_x = mpi_comm.recv(source=0, tag=2)
@@ -243,5 +287,11 @@ if __name__ == '__main__':
 
             mpi_comm.send(world, dest=0, tag=4)
 
-            mpi_comm.send(world[start_x], dest=(mpi_rank - 1))
+            mpi_comm.send(world[start_x], dest=(__get_previous_mpi_rank()), tag=10)
+            mpi_comm.send(world[end_x], dest=(__get_next_mpi_rank()), tag=11)
 
+            start_row_minus_one = mpi_comm.recv(source=(__get_previous_mpi_rank()), tag=11)
+            end_row_plus_one = mpi_comm.recv(source=(__get_next_mpi_rank()), tag=10)
+
+            world[__get_start_row_minus_one_index(start_x)] = start_row_minus_one
+            world[__get_end_row_plus_one_index(end_x)] = end_row_plus_one
