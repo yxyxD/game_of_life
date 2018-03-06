@@ -30,7 +30,7 @@ def animate_2d(data):
 # @author   yxyxD
 # @changes
 #       2018-02-21 (yxyxD)  created
-# @brief    Update fuction for 3-dimensional populations.
+# @brief    Update function for 3-dimensional populations.
 def animate_3d(data):
 
     if main_frame.is_paused:
