@@ -5,15 +5,8 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.colors import ListedColormap
 
-from model.c_population import Population
-from model.c_population3d import Population3D
-from model.c_population2d import Population2D
-
-import multiprocessing
-
-import numpy
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from matplotlib.animation import FuncAnimation
+from c_population3d import Population3D
+from c_population2d import Population2D
 
 
 class MainFrame(Tkinter.Frame):

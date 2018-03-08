@@ -3,10 +3,10 @@ import matplotlib.animation as mpl_animation
 import threadsafe_tkinter as Tkinter
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-from model.c_population2d import Population2D
-from model.c_population3d import Population3D
-from view.c_inputs import Inputs
-from view.c_main_frame import MainFrame
+from c_population2d import Population2D
+from c_population3d import Population3D
+from c_inputs import Inputs
+from c_main_frame import MainFrame
 
 
 ################################################################################

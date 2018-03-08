@@ -1,6 +1,6 @@
 import numpy
 
-from model.c_population import Population
+from c_population import Population
 
 
 class Population3D(Population):

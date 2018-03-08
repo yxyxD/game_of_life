@@ -1,8 +1,5 @@
-import numpy
 import multiprocessing
 import time
-from multiprocessing import Pool
-from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import wait
 
@@ -102,6 +99,16 @@ class Population:
         return self._iteration_count / self._calculation_time
 
     ############################################################################
+    #                           Getter Methods                                 #
+    ############################################################################
+    # @author   yxyxD
+    # @changes
+    #       2018-02-21 (yxyxD) created
+    # @brief    Sets the calculation time of the population.
+    def set_calculation_time(self, value):
+        self._calculation_time = value
+
+    ############################################################################
     #                           Public Methods                                 #
     ############################################################################
     # @author   yxyxD
@@ -128,6 +135,13 @@ class Population:
         self._iteration_count += 1
 
         return self._world
+
+    # @author   marxmanEUW
+    # @changes
+    #       2018-03-08 (marxmanEUW) created
+    # @brief    Increments the iteration count of the population.
+    def iteration_count_increment(self):
+        self._iteration_count += 1
 
     ############################################################################
     #                           Private Methods                                #

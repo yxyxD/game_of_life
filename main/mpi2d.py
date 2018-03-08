@@ -1,10 +1,9 @@
 import matplotlib.animation as mpl_animation
 
-from c_population3d import Population3D
+from c_population2d import Population2D
 from c_main_frame import MainFrame
 
 import threadsafe_tkinter as Tkinter
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 import numpy
 import time
@@ -12,7 +11,7 @@ import time
 from mpi4py import MPI
 
 
-standard_grid_size = 10
+standard_grid_size = 100
 animate = True
 
 
@@ -48,49 +47,14 @@ def __user_output_calculation_speed():
 #           Updates the data grid for the animation. Do not change location or
 #           parameter, unless you know what you are doing.
 def update(data):
-    global world, main_frame
-
-    main_frame.clear_axes()
-
-    main_frame.axis.set_xlim([0, main_frame.population.get_grid_size()])
-    main_frame.axis.set_ylim([0, main_frame.population.get_grid_size()])
-    main_frame.axis.set_zlim([0, main_frame.population.get_grid_size()])
-
-    main_frame.axis.set_xlabel("x")
-    main_frame.axis.set_ylabel("y")
-    main_frame.axis.set_zlabel("z")
+    global world, main_frame, calculation_time
 
     world = main_frame.population.get_world()
     __calculate_next_generation()
+    main_frame.mat.set_data(world)
 
-    for x in range(main_frame.population.get_grid_size()):
-        for y in range(main_frame.population.get_grid_size()):
-            for z in range(main_frame.population.get_grid_size()):
-
-                if world[x][y][z] == 1:
-                    points = numpy.array([
-                        [x, y, z],              # [0] down lower left
-                        [x + 1, y, z],          # [1] down lower right
-                        [x, y + 1, z],          # [2] down upper left
-                        [x + 1, y + 1, z],      # [3] down upper right
-                        [x, y, z + 1],          # [4] up lower left
-                        [x + 1, y, z + 1],      # [5] up lower right
-                        [x, y + 1, z + 1],      # [6] up upper left
-                        [x + 1, y + 1, z + 1]   # [7] up upper right
-                    ])
-
-                    sides = [
-                        [points[0], points[1], points[3], points[2]],   # bottom
-                        [points[0], points[1], points[5], points[4]],   # front
-                        [points[0], points[2], points[6], points[4]],   # left
-                        [points[1], points[3], points[7], points[5]],   # right
-                        [points[2], points[3], points[7], points[6]],   # back
-                        [points[4], points[5], points[7], points[6]]    # top
-                    ]
-
-                    main_frame.axis.add_collection3d(Poly3DCollection(
-                        sides, facecolors='blue', linewidths=1, edgecolors='black'
-                    ))
+    main_frame.population.iteration_count_increment()
+    main_frame.population.set_calculation_time(calculation_time)
 
     main_frame.update_population_status()
     __user_output_calculation_speed()
@@ -158,18 +122,17 @@ def __calculate_section_of_world(start_x, end_x):
 
     for x in range(start_x, end_x):
         for y in range(standard_grid_size):
-            for z in range(standard_grid_size):
-
-                neighbor_count = __get_neighbor_count(x, y, z)
-
-                if world[x][y][z] == 1:
-                    if (neighbor_count >= 2) and (neighbor_count <= 4):
-                        new_world[x][y][z] = 1
-                    else:
-                        new_world[x][y][z] = 0
-                elif world[x][y][z] == 0:
-                    if (neighbor_count >= 5) and (neighbor_count <= 6):
-                        new_world[x][y][z] = 1
+            neighbor_count = __get_neighbor_count(x, y)
+            if world[x, y] == 1:
+                if neighbor_count < 2:
+                    new_world[x, y] = 0
+                elif neighbor_count == 2 or neighbor_count == 3:
+                    new_world[x, y] = 1
+                elif neighbor_count > 3:
+                    new_world[x, y] = 0
+            elif world[x, y] == 0:
+                if neighbor_count == 3:
+                    new_world[x, y] = 1
 
     world = new_world.copy()
 
@@ -184,31 +147,25 @@ def __calculate_section_of_world(start_x, end_x):
 #           cell. If the cell is on the edge of grid, cells on the other
 #           end of the grid count as neighbors too.
 # @todo     the counting logic for cells at the edge is most likely wrong
-def __get_neighbor_count(x, y, z):
+def __get_neighbor_count(x, y):
     global world
 
     count = 0
 
     for i in [x - 1, x, x + 1]:
         for j in [y - 1, y, y + 1]:
-            for k in [z - 1, z, z + 1]:
 
-                if (i == x) and (j == y) and (z == k):
-                    continue
+            if (i == x) and (j == y):
+                continue
 
-                if (i == x) and (j == y) and (z == k):
-                    continue
-
-                if i == standard_grid_size:
-                    continue
-
-                if j == standard_grid_size:
-                    continue
-
-                if k == standard_grid_size:
-                    continue
-
-                count += world[i][j][k]
+            if (i != standard_grid_size) and (j != standard_grid_size):
+                count += world[i][j]
+            elif (i == standard_grid_size) and (j != standard_grid_size):
+                count += world[0][j]
+            elif (i != standard_grid_size) and (j == standard_grid_size):
+                count += world[i][0]
+            else:
+                count += world[0][0]
 
     return count
 
@@ -271,19 +228,15 @@ if __name__ == '__main__':
         print("MPI size: " + str(mpi_size))
 
     if mpi_rank == 0:
-        print("")
-        print("Program started")
-        print("")
-
         world = numpy.random.randint(
             2,
-            size=(standard_grid_size, standard_grid_size, standard_grid_size)
+            size=(standard_grid_size, standard_grid_size)
         )
 
         if animate:
 
-            population_type = "3d"
-            population = Population3D(standard_grid_size, "seq")
+            population_type = "2d"
+            population = Population2D(standard_grid_size, "seq")
 
             root = Tkinter.Tk()
             main_frame = MainFrame(root, population)
@@ -308,4 +261,3 @@ if __name__ == '__main__':
             __calculate_section_of_world(start_x, end_x)
 
             mpi_comm.send(world, dest=0, tag=4)
-

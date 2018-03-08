@@ -1,6 +1,6 @@
-from model.c_population import Population
-from model.c_population2d import Population2D
-from model.c_population3d import Population3D
+from c_population import Population
+from c_population2d import Population2D
+from c_population3d import Population3D
 
 
 class Inputs:
