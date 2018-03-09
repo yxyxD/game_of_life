@@ -136,8 +136,20 @@ if __name__ == '__main__':
     population_type = Inputs.user_input_population_type()
     population = __setup_population()
 
-    root = Tkinter.Tk()
-    main_frame = MainFrame(root, population)
-    animation = __setup_animation()
+    animate = Inputs.user_input_animation()
 
-    root.mainloop()
+    if animate:
+
+        root = Tkinter.Tk()
+        main_frame = MainFrame(root, population)
+        animation = __setup_animation()
+
+        root.mainloop()
+    else:
+        while True:
+            population.create_and_return_next_generation()
+            if population.get_iteration_count() % 5 == 0:
+                print("Calculation speed = "
+                      + str(round(population.get_calculation_speed(), 5))
+                      + " iteration(s) per second"
+                )
