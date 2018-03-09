@@ -90,3 +90,28 @@ class Inputs:
         print("Selected __mode: " + mode)
 
         return mode
+
+    # @author   marxmanEUW
+    # @changes
+    #       2018-03-09 (marxmanEUW)  created
+    # @brief    Requests the animation mode.
+    @staticmethod
+    def user_input_animation():
+
+        standard_animation = True
+
+        user_input = input(
+            "Please enter animation type - UI or console ([u] / c): "
+        )
+
+        try:
+            if user_input == 'u':
+                animation = True
+            elif user_input == 'c':
+                animation = False
+            else:
+                animation = standard_animation
+        except ValueError:
+            animation = standard_animation
+
+        return animation

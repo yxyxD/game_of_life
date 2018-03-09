@@ -99,14 +99,22 @@ class Population:
         return self._iteration_count / self._calculation_time
 
     ############################################################################
-    #                           Getter Methods                                 #
+    #                           Setter Methods                                 #
     ############################################################################
-    # @author   yxyxD
+    # @author   marxmanEUW
     # @changes
     #       2018-02-21 (yxyxD) created
     # @brief    Sets the calculation time of the population.
-    def set_calculation_time(self, value):
-        self._calculation_time = value
+    def set_calculation_time(self, calculation_time):
+        self._calculation_time = calculation_time
+
+    # @author   marxmanEUW
+    # @changes
+    #       2018-02-21 (yxyxD) created
+    # @brief    Sets the calculation time of the population.
+    def set_world(self, world):
+        self._world = world.copy()
+
 
     ############################################################################
     #                           Public Methods                                 #

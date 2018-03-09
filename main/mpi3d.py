@@ -2,6 +2,7 @@ import matplotlib.animation as mpl_animation
 
 from c_population3d import Population3D
 from c_main_frame import MainFrame
+from c_inputs import Inputs
 
 import threadsafe_tkinter as Tkinter
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -13,7 +14,6 @@ from mpi4py import MPI
 
 
 standard_grid_size = 10
-animate = True
 
 
 ################################################################################
@@ -25,14 +25,14 @@ animate = True
 #       2018-02-15 (marxmanEUW)  modified for mpi
 # @brief    Prints the required calculation speed per generation.
 def __user_output_calculation_speed():
-    global iteration_count, calculation_time
 
-    if iteration_count % 5 == 0:
-        print(
-            "Calculation speed = "
-              + str(round((iteration_count / calculation_time), 5))
-              + " iteration(s) per second"
-        )
+    if not animate:
+        if iteration_count % 5 == 0:
+            print(
+                "Calculation speed = "
+                  + str(round((iteration_count / calculation_time), 5))
+                  + " iteration(s) per second"
+            )
 
     return
 
@@ -48,7 +48,7 @@ def __user_output_calculation_speed():
 #           Updates the data grid for the animation. Do not change location or
 #           parameter, unless you know what you are doing.
 def update(data):
-    global world, main_frame, calculation_time
+    global world
 
     main_frame.clear_axes()
 
@@ -62,6 +62,8 @@ def update(data):
 
     world = main_frame.population.get_world()
     __calculate_next_generation()
+    main_frame.population.set_world(world)
+
     main_frame.population.iteration_count_increment()
     main_frame.population.set_calculation_time(calculation_time)
 
@@ -116,7 +118,7 @@ def loop_no_animation():
 # @brief    Creates and returns the grid of the next population. The
 #           population status of the object will be updated as well.
 def __calculate_next_generation():
-    global world, new_world, iteration_count, calculation_time
+    global world, iteration_count, calculation_time
 
     mpi_comm = MPI.COMM_WORLD
 
@@ -154,7 +156,7 @@ def __calculate_next_generation():
 # @brief    Calculates a part of the new world (the rows between start_x and
 #           end_x).
 def __calculate_section_of_world(start_x, end_x):
-    global world, new_world
+    global world
 
     new_world = world.copy()
 
@@ -187,7 +189,6 @@ def __calculate_section_of_world(start_x, end_x):
 #           end of the grid count as neighbors too.
 # @todo     the counting logic for cells at the edge is most likely wrong
 def __get_neighbor_count(x, y, z):
-    global world
 
     count = 0
 
@@ -277,6 +278,8 @@ if __name__ == '__main__':
             2,
             size=(standard_grid_size, standard_grid_size, standard_grid_size)
         )
+
+        animate = Inputs.user_input_animation()
 
         if animate:
 
