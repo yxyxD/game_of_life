@@ -1,0 +1,2 @@
+PATH_TO_GOL=/home/ostertag/game_of_life
+PYTHONPATH=$PATH_TO_GOL/model:$PATH_TO_GOL/view:$PYTHONPATH
