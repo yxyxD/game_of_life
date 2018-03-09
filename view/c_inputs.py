@@ -74,7 +74,7 @@ class Inputs:
         standard_mode = Population.mode_sequential
 
         user_input = input(
-            "Please enter the requested __mode - sequential or parallel ([s] / p): "
+            "Please enter the requested mode - sequential or parallel ([s] / p): "
         )
 
         try:
@@ -87,6 +87,6 @@ class Inputs:
         except ValueError:
             mode = standard_mode
 
-        print("Selected __mode: " + mode)
+        print("Selected mode: " + mode)
 
         return mode
